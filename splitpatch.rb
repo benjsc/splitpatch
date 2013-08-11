@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby 
+#!/usr/bin/env ruby
 #
 # splitpatch is a simple script to split a patch up into multiple patch files.
 # if the --hunks option is provided on the command line, each hunk gets its
