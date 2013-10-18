@@ -46,6 +46,13 @@ class Splitter
         return open(filename, "w")
     end
 
+    def getFilename(line)
+        tokens = line.split(" ")
+        tokens = tokens[1].split(":")
+        tokens = tokens[0].split("/")
+        return tokens[-1]
+    end
+
     # Split the patchfile by files 
     def splitByFile
         outfile = nil
@@ -59,10 +66,7 @@ class Splitter
                     outfile.close_write
                 end
                 #find filename
-                tokens = line.split(" ")
-                tokens = tokens[1].split(":")
-                tokens = tokens[0].split("/")
-                filename = tokens[-1]
+                filename = getFilename(line)
                 filename << ".patch"
                 outfile = createFile(filename)
                 outfile.write(line)
@@ -86,10 +90,7 @@ class Splitter
             # we need to create a new file
             if (line =~ /--- .*/) == 0
                 #find filename
-                tokens = line.split(" ")
-                tokens = tokens[1].split(":")
-                tokens = tokens[0].split("/")
-                filename = tokens[-1]
+                filename = getFilename(line)
                 header = line
                 # next line is header too
                 line = stream.readline
