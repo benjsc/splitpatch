@@ -55,13 +55,25 @@ class Splitter
 
     # Split the patchfile by files 
     def splitByFile
+        legacy = false
         outfile = nil
         stream = open(@filename)
         until (stream.eof?)
             line = stream.readline
 
             # we need to create a new file
-            if (line =~ /--- .*/) == 0
+            if (line =~ /^Index: .*/) == 0
+                # patch includes Index lines
+                # drop into "legacy mode"
+                legacy = true
+                if (outfile)
+                    outfile.close_write
+                end
+                filename = getFilename(line)
+                filename << ".patch"
+                outfile = createFile(filename)
+                outfile.write(line)
+            elsif (line =~ /--- .*/) == 0 and not legacy
                 if (outfile) 
                     outfile.close_write
                 end
@@ -79,6 +91,7 @@ class Splitter
     end
 
     def splitByHunk
+        legacy = false
         outfile = nil
         stream = open(@filename)
         filename = ""
@@ -88,7 +101,19 @@ class Splitter
             line = stream.readline
 
             # we need to create a new file
-            if (line =~ /--- .*/) == 0
+            if (line =~ /^Index: .*/) == 0
+                # patch includes Index lines
+                # drop into "legacy mode"
+                legacy = true
+                filename = getFilename(line)
+                header = line
+                # remaining 3 lines of header
+                for i in 0..2
+                    line = stream.readline
+                    header << line
+                end
+                counter = 0
+            elsif (line =~ /--- .*/) == 0 and not legacy
                 #find filename
                 filename = getFilename(line)
                 header = line
