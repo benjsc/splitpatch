@@ -34,6 +34,18 @@ class Splitter
         return File.exist?(@filename) && File.readable?(@filename)
     end
 
+    def createFile(filename)
+        if File.exists?(filename)
+            puts "File #{filename} already exists. Renaming patch."
+            appendix = 0
+            while File.exists?("#{filename}.#{appendix}")
+                appendix += 1
+            end
+            filename << ".#{appendix}"
+        end
+        return open(filename, "w")
+    end
+
     # Split the patchfile by files 
     def splitByFile
         outfile = nil
@@ -52,15 +64,7 @@ class Splitter
                 tokens = tokens[0].split("/")
                 filename = tokens[-1]
                 filename << ".patch"
-                if File.exists?(filename)
-                    puts "File #{filename} already exists. Renaming patch."
-                    appendix = 0
-                    while File.exists?("#{filename}.#{appendix}")
-                        appendix += 1
-                    end
-                    filename << ".#{appendix}"
-                end
-                outfile = open(filename, "w")
+                outfile = createFile(filename)
                 outfile.write(line)
             else
                 if outfile
@@ -96,15 +100,7 @@ class Splitter
                     outfile.close_write
                 end
                 hunkfilename = "#{filename}.#{counter}.patch"
-                if File.exists?(hunkfilename)
-                    puts "File #{hunkfilename} already exists. Renaming patch."
-                    appendix = 0
-                    while File.exists?("#{hunkfilename}.#{appendix}")
-                        appendix += 1
-                    end
-                    hunkfilename << ".#{appendix}"
-                end
-                outfile = open(hunkfilename, "w")
+                outfile = createFile(hunkfilename)
                 counter += 1
 
                 outfile.write(header)
