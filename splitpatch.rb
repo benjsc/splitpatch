@@ -26,7 +26,7 @@
 #       command line, each hunk gets its own patchfile.
 
 class Splitter
-   def initialize(file)
+    def initialize(file)
        @filename = file
     end
 
