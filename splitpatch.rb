@@ -28,6 +28,11 @@
 class Splitter
     def initialize(file)
        @filename = file
+       @fullname = false
+    end
+
+    def fullname(opt)
+       @fullname = opt
     end
 
     def validFile?
@@ -50,7 +55,11 @@ class Splitter
         tokens = line.split(" ")
         tokens = tokens[1].split(":")
         tokens = tokens[0].split("/")
-        return tokens[-1]
+        if @fullname
+            return tokens.join('-')
+        else
+            return tokens[-1]
+        end
     end
 
     # Split the patchfile by files 
@@ -145,19 +154,25 @@ end
 ########################     MAIN     ########################
 
 
-if ARGV.length < 1 or ARGV.length > 2
-    puts "Wrong parameter. Usage: splitpatch.rb [--hunks] <patchfile>"
+if ARGV.length < 1 or ARGV.length > 3
+    puts "Wrong parameter. Usage: splitpatch.rb [--fullname] [--hunks] <patchfile>"
     exit 1
 elsif ARGV[0] == "--help"
     puts "splitpatch splits a patch that is supposed to patch multiple files"
     puts "into a set of patches."
     puts "Currently splits unified diff patches."
     puts "If the --hunk option is given, a new file is created for each hunk."
+    puts "If the --fullname option is given, new files are named using the"
+    puts "full path of the patch to avoid duplicates in large projects."
     exit 1
 else
     s = Splitter.new(ARGV[-1])
     if s.validFile?
-        if ARGV[0] == "--hunks"
+        if ARGV[0] == "--fullname" or ARGV[1] == "--fullname"
+            s.fullname(true)
+        end
+
+        if ARGV[0] == "--hunks" or ARGV[1] == "--hunks"
             s.splitByHunk
         else
             s.splitByFile
