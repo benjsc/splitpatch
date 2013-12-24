@@ -26,41 +26,70 @@
 #       command line, each hunk gets its own patchfile.
 
 class Splitter
-   def initialize(file)
+    def initialize(file)
        @filename = file
+       @fullname = false
+    end
+
+    def fullname(opt)
+       @fullname = opt
     end
 
     def validFile?
         return File.exist?(@filename) && File.readable?(@filename)
     end
 
+    def createFile(filename)
+        if File.exists?(filename)
+            puts "File #{filename} already exists. Renaming patch."
+            appendix = 0
+            while File.exists?("#{filename}.#{appendix}")
+                appendix += 1
+            end
+            filename << ".#{appendix}"
+        end
+        return open(filename, "w")
+    end
+
+    def getFilename(line)
+        tokens = line.split(" ")
+        tokens = tokens[1].split(":")
+        tokens = tokens[0].split("/")
+        if @fullname
+            return tokens.join('-')
+        else
+            return tokens[-1]
+        end
+    end
+
     # Split the patchfile by files 
     def splitByFile
+        legacy = false
         outfile = nil
         stream = open(@filename)
         until (stream.eof?)
             line = stream.readline
 
             # we need to create a new file
-            if (line =~ /--- .*/) == 0
+            if (line =~ /^Index: .*/) == 0
+                # patch includes Index lines
+                # drop into "legacy mode"
+                legacy = true
+                if (outfile)
+                    outfile.close_write
+                end
+                filename = getFilename(line)
+                filename << ".patch"
+                outfile = createFile(filename)
+                outfile.write(line)
+            elsif (line =~ /--- .*/) == 0 and not legacy
                 if (outfile) 
                     outfile.close_write
                 end
                 #find filename
-                tokens = line.split(" ")
-                tokens = tokens[1].split(":")
-                tokens = tokens[0].split("/")
-                filename = tokens[-1]
+                filename = getFilename(line)
                 filename << ".patch"
-                if File.exists?(filename)
-                    puts "File #{filename} already exists. Renaming patch."
-                    appendix = 0
-                    while File.exists?("#{filename}.#{appendix}")
-                        appendix += 1
-                    end
-                    filename << ".#{appendix}"
-                end
-                outfile = open(filename, "w")
+                outfile = createFile(filename)
                 outfile.write(line)
             else
                 if outfile
@@ -71,6 +100,7 @@ class Splitter
     end
 
     def splitByHunk
+        legacy = false
         outfile = nil
         stream = open(@filename)
         filename = ""
@@ -80,12 +110,21 @@ class Splitter
             line = stream.readline
 
             # we need to create a new file
-            if (line =~ /--- .*/) == 0
+            if (line =~ /^Index: .*/) == 0
+                # patch includes Index lines
+                # drop into "legacy mode"
+                legacy = true
+                filename = getFilename(line)
+                header = line
+                # remaining 3 lines of header
+                for i in 0..2
+                    line = stream.readline
+                    header << line
+                end
+                counter = 0
+            elsif (line =~ /--- .*/) == 0 and not legacy
                 #find filename
-                tokens = line.split(" ")
-                tokens = tokens[1].split(":")
-                tokens = tokens[0].split("/")
-                filename = tokens[-1]
+                filename = getFilename(line)
                 header = line
                 # next line is header too
                 line = stream.readline
@@ -96,15 +135,7 @@ class Splitter
                     outfile.close_write
                 end
                 hunkfilename = "#{filename}.#{counter}.patch"
-                if File.exists?(hunkfilename)
-                    puts "File #{hunkfilename} already exists. Renaming patch."
-                    appendix = 0
-                    while File.exists?("#{hunkfilename}.#{appendix}")
-                        appendix += 1
-                    end
-                    hunkfilename << ".#{appendix}"
-                end
-                outfile = open(hunkfilename, "w")
+                outfile = createFile(hunkfilename)
                 counter += 1
 
                 outfile.write(header)
@@ -123,19 +154,25 @@ end
 ########################     MAIN     ########################
 
 
-if ARGV.length < 1 or ARGV.length > 2
-    puts "Wrong parameter. Usage: splitpatch.rb [--hunks] <patchfile>"
+if ARGV.length < 1 or ARGV.length > 3
+    puts "Wrong parameter. Usage: splitpatch.rb [--fullname] [--hunks] <patchfile>"
     exit 1
 elsif ARGV[0] == "--help"
     puts "splitpatch splits a patch that is supposed to patch multiple files"
     puts "into a set of patches."
     puts "Currently splits unified diff patches."
     puts "If the --hunk option is given, a new file is created for each hunk."
+    puts "If the --fullname option is given, new files are named using the"
+    puts "full path of the patch to avoid duplicates in large projects."
     exit 1
 else
     s = Splitter.new(ARGV[-1])
     if s.validFile?
-        if ARGV[0] == "--hunks"
+        if ARGV[0] == "--fullname" or ARGV[1] == "--fullname"
+            s.fullname(true)
+        end
+
+        if ARGV[0] == "--hunks" or ARGV[1] == "--hunks"
             s.splitByHunk
         else
             s.splitByFile
