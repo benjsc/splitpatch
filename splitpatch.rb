@@ -43,8 +43,10 @@ class Splitter
         if File.exists?(filename)
             puts "File #{filename} already exists. Renaming patch."
             appendix = 0
-            while File.exists?("#{filename}.#{appendix}")
+            zero = appendix.to_s.rjust(3, '0')
+            while File.exists?("#{filename}.#{zero}")
                 appendix += 1
+                zero = appendix.to_s.rjust(3, '0')
             end
             filename << ".#{appendix}"
         end
