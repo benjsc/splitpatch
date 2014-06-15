@@ -150,37 +150,63 @@ class Splitter
 
 end
 
+def help
+    puts <<EOF
+SYNOPSIS
+    #{PROGRAM} [options] FILE.patch
+
+OPTIONS
+    -h,--help
+    -H,--hunk
+    -V,--version
+
+DESCRIPTION
+
+    Split the patch up into files or hunks
+
+    Divide a patch or diff file into pieces. The split can made by file
+    or by hunk basis. This makes it possible to separate changes that
+    might not be desirable or assemble the patch into a more coherent set
+    of changes. See e.g. combinediff(1) from patchutils package.
+
+    Note: only patches in unified format are recognized.
+EOF
+end
+
+def version
+  puts "#{VERSION} #{LICENSE} #{AUTHOR}"
+end
 
 ########################     MAIN     ########################
 
-
-if ARGV.length < 1 or ARGV.length > 3
-    puts "Wrong parameter. Usage: splitpatch.rb [--fullname] [--hunks] <patchfile>"
-    exit 1
-elsif ARGV[0] == "--help"
-    puts "splitpatch splits a patch that is supposed to patch multiple files"
-    puts "into a set of patches."
-    puts "Currently splits unified diff patches."
-    puts "If the --hunk option is given, a new file is created for each hunk."
-    puts "If the --fullname option is given, new files are named using the"
-    puts "full path of the patch to avoid duplicates in large projects."
+if ARGV.length < 1 or ARGV.length > 2
+    puts "ERROR: missing argument. See --help."
     exit 1
 else
-    s = Splitter.new(ARGV[-1])
-    if s.validFile?
-        if ARGV[0] == "--fullname" or ARGV[1] == "--fullname"
-            s.fullname(true)
+    opt = ARGV[0]
+    if /^-h$|--help/.match(opt)
+        help
+        exit 0
+    elsif /^-H$|--hunks?/.match(opt)
+        hunk = 1
+    elsif /^-V$|--version/.match(opt)
+        version
+        exit 0
+    elsif /^-/.match(opt)
+        puts "ERROR: Unknonw option: #{opt}. See --help."
+        exit 1
         end
-
-        if ARGV[0] == "--hunks" or ARGV[1] == "--hunks"
+    file = ARGV[-1]
+    s = Splitter.new(file)
+    if s.validFile?
+        if hunk
             s.splitByHunk
         else
             s.splitByFile
         end
     else
-        puts "File does not exist or is not readable"
+        puts "File does not exist or is not readable: #{file}"
     end
 end
 
-
-
+# End of file
