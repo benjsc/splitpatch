@@ -134,7 +134,9 @@ class Splitter
                 if (outfile) 
                     outfile.close_write
                 end
-                hunkfilename = "#{filename}.#{counter}.patch"
+
+                zero = counter.to_s.rjust(3, '0')
+                hunkfilename = "#{filename}.#{zero}.patch"
                 outfile = createFile(hunkfilename)
                 counter += 1
 
