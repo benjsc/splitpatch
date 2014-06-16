@@ -48,7 +48,7 @@ class Splitter
                 appendix += 1
                 zero = appendix.to_s.rjust(3, '0')
             end
-            filename << ".#{appendix}"
+            filename << ".#{zero}"
         end
         return open(filename, "w")
     end
