@@ -21,6 +21,11 @@
 #
 #  Description
 #
+PROGRAM = "splitpatch"
+VERSION = 1.0
+LICENSE = "GPL-2+"  # See official acronyms: https://spdx.org/licenses/
+AUTHOR  = "Peter Hutterer <peter@cs.unisa.edu.au>"
+
 #       Splitpatch is a simple script to split a patch up into
 #       multiple patch files. If the --hunks option is provided on the
 #       command line, each hunk gets its own patchfile.
