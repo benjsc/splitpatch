@@ -2,7 +2,9 @@
 #
 #   Copyright
 #
-#       Copyright (C) 2007 Peter Hutterer <peter@cs.unisa.edu.au>
+#       Copyright (C) 2014 Jari Aalto <jari.aalto@cante.net>
+#       Copyright (C) 2007-2014 Peter Hutterer <peter.hutterer@who-t.net>
+#       Copyright (C) 2007-2014 Benjamin Close <Benjamin.Close@clearchain.com>
 #
 #   License
 #
@@ -24,7 +26,7 @@
 PROGRAM = "splitpatch"
 VERSION = 1.0
 LICENSE = "GPL-2+"  # See official acronyms: https://spdx.org/licenses/
-AUTHOR  = "Peter Hutterer <peter@cs.unisa.edu.au>"
+AUTHOR  = "Peter Hutterer <peter.hutterer@who-t.net>"
 
 #       Splitpatch is a simple script to split a patch up into
 #       multiple patch files. If the --hunks option is provided on the

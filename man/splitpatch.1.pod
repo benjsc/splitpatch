@@ -1,6 +1,6 @@
 #   Copyright
 #
-#	Copyright (C) 2013 Jari Aalto
+#	Copyright (C) 2013-2014 Jari Aalto
 #
 #   License
 #
@@ -131,7 +131,9 @@ wiggle(1)
 
 =head1 AUTHORS
 
-Program was written by Peter Hutterer <peter@cs.unisa.edu.au>.
+Program was written by Peter Hutterer <peter.hutterer@who-t.net>,
+Benjamin Close <Benjamin.Close@clearchain.com>. Enhancements by
+Jari Aalto <jari.aalto@cante.net>.
 
 This manual page was written by Jari Aalto <jari.aalto@cante.net>.
 Released under license GNU GPL version 2 or (at your option) any later
