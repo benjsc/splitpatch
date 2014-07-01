@@ -24,7 +24,7 @@
 #  Description
 #
 PROGRAM = "splitpatch"
-VERSION = 1.0
+MYVERSION = 1.0
 LICENSE = "GPL-2+"  # See official acronyms: https://spdx.org/licenses/
 AUTHOR  = "Peter Hutterer <peter.hutterer@who-t.net>"
 
@@ -185,7 +185,7 @@ EOF
 end
 
 def version
-  puts "#{VERSION} #{LICENSE} #{AUTHOR}"
+  puts "#{MYVERSION} #{LICENSE} #{AUTHOR}"
 end
 
 ########################     MAIN     ########################
@@ -204,7 +204,7 @@ else
         version
         exit 0
     elsif /^-/.match(opt)
-        puts "ERROR: Unknonw option: #{opt}. See --help."
+        puts "ERROR: Unknown option: #{opt}. See --help."
         exit 1
         end
     file = ARGV[-1]
