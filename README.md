@@ -1,3 +1,10 @@
+> [!CAUTION] 
+> This repository is no longer maintained, the latest version of splitpatch is available at:
+> https://github.com/jaalto/splitpatch
+> 
+> (see: https://github.com/benjsc/splitpatch/issues/11)
+
+
 splitpatch
 ==========
 
